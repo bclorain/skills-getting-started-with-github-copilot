@@ -54,13 +54,14 @@ def test_signup_adds_participant(client):
     response = client.post(
         f"/activities/{activity_name}/signup", params={"email": email}
     )
+    activities_response = client.get("/activities")
 
     # Assert
     assert response.status_code == 200
     assert response.json() == {
         "message": f"Signed up {email} for {activity_name}"
     }
-    assert email in app_module.activities[activity_name]["participants"]
+    assert email in activities_response.json()[activity_name]["participants"]
 
 
 def test_signup_rejects_duplicate_participant(client):
@@ -114,13 +115,14 @@ def test_unregister_removes_participant(client):
     response = client.delete(
         f"/activities/{activity_name}/signup", params={"email": email}
     )
+    activities_response = client.get("/activities")
 
     # Assert
     assert response.status_code == 200
     assert response.json() == {
         "message": f"Unregistered {email} from {activity_name}"
     }
-    assert email not in app_module.activities[activity_name]["participants"]
+    assert email not in activities_response.json()[activity_name]["participants"]
 
 
 def test_unregister_rejects_unknown_activity(client):
